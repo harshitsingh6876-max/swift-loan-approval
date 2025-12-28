@@ -101,6 +101,18 @@ export default {
           "0%": { transform: "scale(0.95)", opacity: "0" },
           "100%": { transform: "scale(1)", opacity: "1" },
         },
+        ping: {
+          "75%, 100%": { transform: "scale(2)", opacity: "0" },
+        },
+        bounce: {
+          "0%, 100%": { transform: "translateY(-25%)", animationTimingFunction: "cubic-bezier(0.8,0,1,1)" },
+          "50%": { transform: "translateY(0)", animationTimingFunction: "cubic-bezier(0,0,0.2,1)" },
+        },
+        "data-flow": {
+          "0%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+          "100%": { backgroundPosition: "0% 50%" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -108,6 +120,9 @@ export default {
         shimmer: "shimmer 2s infinite linear",
         "slide-in-right": "slide-in-right 0.4s ease-out",
         "scale-in": "scale-in 0.3s ease-out",
+        ping: "ping 1s cubic-bezier(0, 0, 0.2, 1) infinite",
+        bounce: "bounce 1s infinite",
+        "data-flow": "data-flow 3s ease infinite",
       },
       boxShadow: {
         soft: "var(--shadow-soft)",
