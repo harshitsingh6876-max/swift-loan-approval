@@ -9,7 +9,9 @@ import {
   Shield,
   Banknote,
   CircleDot,
+  Download,
 } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 const ApplicationTracker = () => {
   const [applicationId, setApplicationId] = useState("");
@@ -67,6 +69,89 @@ const ApplicationTracker = () => {
     if (applicationId.trim()) {
       setIsTracking(true);
     }
+  };
+
+  const handleDownloadSummary = () => {
+    const currentDate = new Date().toLocaleString("en-IN", {
+      dateStyle: "full",
+      timeStyle: "short",
+    });
+
+    const completedStages = trackingData.stages.filter(s => s.status === "completed");
+    const currentStage = trackingData.stages.find(s => s.status === "current");
+    const pendingStages = trackingData.stages.filter(s => s.status === "pending");
+
+    const summaryContent = `
+════════════════════════════════════════════════════════════════
+                    LOAN APPLICATION STATUS SUMMARY
+════════════════════════════════════════════════════════════════
+
+Generated On: ${currentDate}
+
+────────────────────────────────────────────────────────────────
+                        APPLICATION DETAILS
+────────────────────────────────────────────────────────────────
+
+Application ID     : ${trackingData.applicationId}
+Applicant Name     : ${trackingData.customerName}
+Loan Amount        : ${trackingData.loanAmount}
+Applied Date       : ${trackingData.appliedDate}
+Expected Completion: ${trackingData.expectedDate}
+
+────────────────────────────────────────────────────────────────
+                        CURRENT STATUS
+────────────────────────────────────────────────────────────────
+
+Status: ${trackingData.status}
+Progress: ${completedStages.length} of ${trackingData.stages.length} stages completed
+
+────────────────────────────────────────────────────────────────
+                        STAGE-WISE PROGRESS
+────────────────────────────────────────────────────────────────
+
+${trackingData.stages.map((stage, index) => {
+  const statusIcon = stage.status === "completed" ? "✓" : stage.status === "current" ? "●" : "○";
+  const statusLabel = stage.status === "completed" ? "[COMPLETED]" : stage.status === "current" ? "[IN PROGRESS]" : "[PENDING]";
+  return `${index + 1}. ${statusIcon} ${stage.name}
+   ${statusLabel}
+   Date: ${stage.date}${stage.time ? ` | Time: ${stage.time}` : ""}
+`;
+}).join("\n")}
+
+────────────────────────────────────────────────────────────────
+                           SUMMARY
+────────────────────────────────────────────────────────────────
+
+Completed Stages   : ${completedStages.length}
+Current Stage      : ${currentStage?.name || "N/A"}
+Pending Stages     : ${pendingStages.length}
+
+────────────────────────────────────────────────────────────────
+
+For any queries, contact our support team:
+Email: support@properloan.in
+Phone: 1800-XXX-XXXX
+
+════════════════════════════════════════════════════════════════
+                    Thank you for choosing ProperLoan
+════════════════════════════════════════════════════════════════
+`.trim();
+
+    // Create and download the file
+    const blob = new Blob([summaryContent], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `Loan_Status_${trackingData.applicationId}_${new Date().toISOString().split("T")[0]}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "Summary Downloaded",
+      description: "Your application status summary has been downloaded successfully.",
+    });
   };
 
   const getStageIcon = (stage: (typeof trackingData.stages)[0]) => {
@@ -242,8 +327,8 @@ const ApplicationTracker = () => {
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 mt-8 pt-6 border-t border-border">
-              <Button variant="outline" className="flex-1">
-                <FileText className="w-4 h-4" />
+              <Button variant="outline" className="flex-1" onClick={handleDownloadSummary}>
+                <Download className="w-4 h-4" />
                 Download Summary
               </Button>
               <Button variant="hero" className="flex-1">
