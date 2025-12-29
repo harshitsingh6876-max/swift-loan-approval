@@ -1,12 +1,24 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { ArrowRight, Calculator, IndianRupee } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const LoanCalculator = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [loanAmount, setLoanAmount] = useState(5000000);
   const [tenure, setTenure] = useState(15);
   const [interestRate, setInterestRate] = useState(8.5);
+
+  const handleApply = () => {
+    if (user) {
+      navigate("/apply");
+    } else {
+      navigate("/auth");
+    }
+  };
 
   const calculations = useMemo(() => {
     const principal = loanAmount;
@@ -190,7 +202,7 @@ const LoanCalculator = () => {
               </div>
 
               {/* CTA */}
-              <Button variant="hero" size="xl" className="w-full group">
+              <Button variant="hero" size="xl" className="w-full group" onClick={handleApply}>
                 Apply for This Loan
                 <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
               </Button>
