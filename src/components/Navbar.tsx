@@ -87,10 +87,15 @@ const Navbar = () => {
                 <Button variant="outline" size="sm" onClick={() => navigate("/auth")}>
                   Login
                 </Button>
-                <Button variant="hero" size="sm" onClick={() => navigate("/auth")}>
+                <Button variant="hero" size="sm" onClick={() => navigate("/apply")}>
                   Apply Now
                 </Button>
               </>
+            )}
+            {user && (
+              <Button variant="hero" size="sm" onClick={() => navigate("/apply")}>
+                Apply Now
+              </Button>
             )}
           </div>
 
@@ -147,10 +152,15 @@ const Navbar = () => {
                     <Button variant="outline" className="w-full" onClick={() => { navigate("/auth"); setIsOpen(false); }}>
                       Login
                     </Button>
-                    <Button variant="hero" className="w-full" onClick={() => { navigate("/auth"); setIsOpen(false); }}>
+                    <Button variant="hero" className="w-full" onClick={() => { navigate("/apply"); setIsOpen(false); }}>
                       Apply Now
                     </Button>
                   </>
+                )}
+                {user && (
+                  <Button variant="hero" className="w-full mt-2" onClick={() => { navigate("/apply"); setIsOpen(false); }}>
+                    Apply Now
+                  </Button>
                 )}
               </div>
             </div>
