@@ -1,9 +1,15 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Shield, Phone } from "lucide-react";
+import { Menu, X, Shield, Phone, Sun, Moon, LogOut } from "lucide-react";
+import { useTheme } from "@/hooks/useTheme";
+import { useAuth } from "@/hooks/useAuth";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const navLinks = [
     { name: "Home", href: "#" },
@@ -12,6 +18,11 @@ const Navbar = () => {
     { name: "Calculator", href: "#calculator" },
     { name: "Track Application", href: "#track" },
   ];
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass">
@@ -46,21 +57,64 @@ const Navbar = () => {
               <Phone className="w-4 h-4" />
               1800-123-4567
             </a>
-            <Button variant="outline" size="sm">
-              Login
+            
+            {/* Theme Toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              {theme === "light" ? (
+                <Moon className="w-5 h-5" />
+              ) : (
+                <Sun className="w-5 h-5" />
+              )}
             </Button>
-            <Button variant="hero" size="sm">
-              Apply Now
-            </Button>
+
+            {user ? (
+              <>
+                <span className="text-sm text-muted-foreground">
+                  {user.email}
+                </span>
+                <Button variant="outline" size="sm" onClick={handleLogout}>
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" size="sm" onClick={() => navigate("/auth")}>
+                  Login
+                </Button>
+                <Button variant="hero" size="sm" onClick={() => navigate("/auth")}>
+                  Apply Now
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            className="lg:hidden p-2 rounded-lg hover:bg-secondary transition-colors"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          <div className="flex items-center gap-2 lg:hidden">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              {theme === "light" ? (
+                <Moon className="w-5 h-5" />
+              ) : (
+                <Sun className="w-5 h-5" />
+              )}
+            </Button>
+            <button
+              className="p-2 rounded-lg hover:bg-secondary transition-colors"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}
@@ -78,12 +132,26 @@ const Navbar = () => {
                 </a>
               ))}
               <div className="flex flex-col gap-2 mt-4 px-4">
-                <Button variant="outline" className="w-full">
-                  Login
-                </Button>
-                <Button variant="hero" className="w-full">
-                  Apply Now
-                </Button>
+                {user ? (
+                  <>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Signed in as {user.email}
+                    </p>
+                    <Button variant="outline" className="w-full" onClick={handleLogout}>
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Logout
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="outline" className="w-full" onClick={() => { navigate("/auth"); setIsOpen(false); }}>
+                      Login
+                    </Button>
+                    <Button variant="hero" className="w-full" onClick={() => { navigate("/auth"); setIsOpen(false); }}>
+                      Apply Now
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </div>
