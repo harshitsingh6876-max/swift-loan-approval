@@ -77,9 +77,14 @@ const Navbar = () => {
                 <span className="text-sm text-muted-foreground">
                   {user.email}
                 </span>
-                <Button variant="outline" size="sm" onClick={handleLogout}>
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Logout
+                <Button variant="outline" size="sm" onClick={() => navigate("/my-applications")}>
+                  My Applications
+                </Button>
+                <Button variant="hero" size="sm" onClick={() => navigate("/apply")}>
+                  Apply Now
+                </Button>
+                <Button variant="ghost" size="sm" onClick={handleLogout}>
+                  <LogOut className="w-4 h-4" />
                 </Button>
               </>
             ) : (
@@ -91,11 +96,6 @@ const Navbar = () => {
                   Apply Now
                 </Button>
               </>
-            )}
-            {user && (
-              <Button variant="hero" size="sm" onClick={() => navigate("/apply")}>
-                Apply Now
-              </Button>
             )}
           </div>
 
@@ -142,7 +142,13 @@ const Navbar = () => {
                     <p className="text-sm text-muted-foreground mb-2">
                       Signed in as {user.email}
                     </p>
-                    <Button variant="outline" className="w-full" onClick={handleLogout}>
+                    <Button variant="outline" className="w-full" onClick={() => { navigate("/my-applications"); setIsOpen(false); }}>
+                      My Applications
+                    </Button>
+                    <Button variant="hero" className="w-full mt-2" onClick={() => { navigate("/apply"); setIsOpen(false); }}>
+                      Apply Now
+                    </Button>
+                    <Button variant="ghost" className="w-full mt-2" onClick={() => { handleLogout(); setIsOpen(false); }}>
                       <LogOut className="w-4 h-4 mr-2" />
                       Logout
                     </Button>
@@ -152,15 +158,10 @@ const Navbar = () => {
                     <Button variant="outline" className="w-full" onClick={() => { navigate("/auth"); setIsOpen(false); }}>
                       Login
                     </Button>
-                    <Button variant="hero" className="w-full" onClick={() => { navigate("/apply"); setIsOpen(false); }}>
+                    <Button variant="hero" className="w-full mt-2" onClick={() => { navigate("/apply"); setIsOpen(false); }}>
                       Apply Now
                     </Button>
                   </>
-                )}
-                {user && (
-                  <Button variant="hero" className="w-full mt-2" onClick={() => { navigate("/apply"); setIsOpen(false); }}>
-                    Apply Now
-                  </Button>
                 )}
               </div>
             </div>
