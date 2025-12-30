@@ -15,8 +15,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Home, Briefcase, IndianRupee, Clock } from "lucide-react";
+import { ArrowLeft, Home, Briefcase, IndianRupee, Clock, CheckCircle, Copy, FileText } from "lucide-react";
 
 const applicationSchema = z.object({
   full_name: z.string().min(2, "Name must be at least 2 characters").max(100),
@@ -42,6 +49,8 @@ const LoanApplication = () => {
   const { user, loading } = useAuth();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [applicationNumber, setApplicationNumber] = useState<string | null>(null);
 
   const {
     register,
@@ -71,31 +80,32 @@ const LoanApplication = () => {
   const onSubmit = async (data: ApplicationFormData) => {
     setIsSubmitting(true);
     try {
-      const { error } = await supabase.from("loan_applications").insert({
-        user_id: user.id,
-        full_name: data.full_name,
-        email: data.email,
-        phone: data.phone,
-        property_type: data.property_type,
-        property_address: data.property_address,
-        property_city: data.property_city,
-        property_state: data.property_state,
-        property_pincode: data.property_pincode,
-        property_value: data.property_value,
-        loan_amount: data.loan_amount,
-        loan_tenure: data.loan_tenure,
-        employment_type: data.employment_type,
-        monthly_income: data.monthly_income,
-        existing_loans: data.existing_loans || 0,
-      });
+      const { data: insertedData, error } = await supabase
+        .from("loan_applications")
+        .insert({
+          user_id: user.id,
+          full_name: data.full_name,
+          email: data.email,
+          phone: data.phone,
+          property_type: data.property_type,
+          property_address: data.property_address,
+          property_city: data.property_city,
+          property_state: data.property_state,
+          property_pincode: data.property_pincode,
+          property_value: data.property_value,
+          loan_amount: data.loan_amount,
+          loan_tenure: data.loan_tenure,
+          employment_type: data.employment_type,
+          monthly_income: data.monthly_income,
+          existing_loans: data.existing_loans || 0,
+        })
+        .select("application_number")
+        .single();
 
       if (error) throw error;
 
-      toast({
-        title: "Application Submitted!",
-        description: "Your loan application has been submitted successfully. We'll contact you soon.",
-      });
-      navigate("/");
+      setApplicationNumber(insertedData?.application_number || null);
+      setShowSuccessDialog(true);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -104,6 +114,16 @@ const LoanApplication = () => {
       });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const copyApplicationNumber = () => {
+    if (applicationNumber) {
+      navigator.clipboard.writeText(applicationNumber);
+      toast({
+        title: "Copied!",
+        description: "Application number copied to clipboard",
+      });
     }
   };
 
@@ -364,6 +384,51 @@ const LoanApplication = () => {
           </form>
         </div>
       </div>
+
+      {/* Success Dialog */}
+      <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="mx-auto w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mb-4">
+              <CheckCircle className="w-10 h-10 text-green-500" />
+            </div>
+            <DialogTitle className="text-center text-2xl">Application Submitted!</DialogTitle>
+            <DialogDescription className="text-center">
+              Your loan application has been submitted successfully. Save your application number to track your application status.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="mt-4">
+            <div className="p-4 rounded-xl bg-primary/10 border border-primary/20">
+              <p className="text-sm text-muted-foreground text-center mb-2">Your Application Number</p>
+              <div className="flex items-center justify-center gap-2">
+                <span className="text-2xl font-bold text-primary font-mono">
+                  {applicationNumber || "Generating..."}
+                </span>
+                {applicationNumber && (
+                  <Button variant="ghost" size="icon" onClick={copyApplicationNumber}>
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            </div>
+            
+            <p className="text-sm text-muted-foreground text-center mt-4">
+              Use this number to track your application in the "Track Application" section
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-2 mt-4">
+            <Button variant="hero" onClick={() => navigate("/my-applications")} className="w-full">
+              <FileText className="w-4 h-4 mr-2" />
+              View My Applications
+            </Button>
+            <Button variant="outline" onClick={() => navigate("/#track")} className="w-full">
+              Track Application
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
