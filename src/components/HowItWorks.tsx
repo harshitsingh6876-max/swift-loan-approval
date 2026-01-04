@@ -89,8 +89,6 @@ const HowItWorks = () => {
 
         {/* Steps */}
         <div className="relative">
-          {/* Connection Line - Desktop */}
-          <div className="hidden lg:block absolute top-24 left-[10%] right-[10%] h-0.5 bg-gradient-to-r from-primary via-accent to-success" />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
             {steps.map((step, index) => {
@@ -101,10 +99,6 @@ const HowItWorks = () => {
                   className="relative group"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  {/* Mobile Connection Line */}
-                  {index < steps.length - 1 && (
-                    <div className="lg:hidden absolute left-8 top-16 bottom-0 w-0.5 bg-border" />
-                  )}
 
                   <div className="relative z-10 flex flex-col items-center text-center">
                     {/* Step Number */}
